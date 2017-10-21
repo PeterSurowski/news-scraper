@@ -1,15 +1,17 @@
-<h1>Wish Saver</h1>
+<h1>News Scraper</h1>
 
-<h3>Save Wishes</h3>
+<h3>Scraped Stories</h3>
+<hr>
 
 <ul>
   {{#each wishes}}
   	<li>
-  	   <p>ID: {{this.id}}</p>
-       <p>Wish: {{this.wish}}</p>
+  	   <p>Headline: {{this.hed}}</p>
+       <p>Story: {{this.body}}</p>
   	</li>
   {{/each}}
 </ul>
+<!-- The above was {{this.id}} and {{this.wish}} -->
 
 <div>
   <form action="/" method="POST">

@@ -42,19 +42,15 @@ module.exports = function(app) {
         if (title && link) {
           console.log("Found titles and links.")
           // Insert the data in the scrapedData db
-          db.Article.insert({
-            title: title,
-            link: link
-          },
-          function(err, inserted) {
-            if (err) {
-              // Log the error if one is encountered during the query
-              console.log(err);
-            }
-            else {
-              // Otherwise, log the inserted data
-              console.log(inserted);
-            }
+          db.Article
+          .create(result)
+          .then(function(dbArticle) {
+            // If we were able to successfully scrape and save an Article, send a message to the client
+            res.send("Scrape Complete");
+          })
+          .catch(function(err) {
+            // If an error occurred, send it to the client
+            res.json(err);
           });
         }
         //console.log(db.Article.insert)

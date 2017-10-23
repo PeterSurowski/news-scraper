@@ -6,12 +6,64 @@
 // =============================================================
 
 // Requiring our Todo model
-var db = require("../models");
+//var db = require("../models");
+var axios = require("axios");
+var cheerio = require("cheerio");
+var request = require("request");
+
+// Set up mongoose:
+var mongoose = require("mongoose");
+mongoose.connect("mongodb://localhost/3000");
+
+
+// Hook mongoose configuration to the db variable
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
 
 // Routes
 // =============================================================
 module.exports = function(app) {
 
+  app.get("/scrape", function(req, res) {
+    console.log("Scrape route being hit.")
+    // Make a request for the news section of ycombinator
+    request("https://news.ycombinator.com/", function(error, response, html) {
+      // Load the html body from request into cheerio
+      var $ = cheerio.load(html);
+      // For each element with a "title" class
+      $(".title").each(function(i, element) {
+        // Save the text and href of each link enclosed in the current element
+        var title = $(element).children("a").text();
+        var link = $(element).children("a").attr("href");
+        console.log(title)
+        console.log(link)
+  
+        // If this found element had both a title and a link
+        if (title && link) {
+          console.log("Found titles and links.")
+          // Insert the data in the scrapedData db
+          db.Article.insert({
+            title: title,
+            link: link
+          },
+          function(err, inserted) {
+            if (err) {
+              // Log the error if one is encountered during the query
+              console.log(err);
+            }
+            else {
+              // Otherwise, log the inserted data
+              console.log(inserted);
+            }
+          });
+        }
+        //console.log(db.Article.insert)
+      });
+    });
+  });
+
+
+/*
   // GET route for getting all of the posts
   app.get("/api/posts/", function(req, res) {
     db.Post.findAll({})
@@ -80,5 +132,5 @@ module.exports = function(app) {
     .then(function(dbPost) {
       res.json(dbPost);
     });
-  });
-};
+  });*/
+}
